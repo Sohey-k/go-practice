@@ -1,12 +1,40 @@
 package main
 
-import "fmt"
+import (
+	"flag"
+	"fmt"
+	"os"
+
+	"github.com/fatih/color"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
-	fmt.Println(10 + 20)
-	fmt.Println(20 - 10)
-	fmt.Println(20 * 10)
-	fmt.Println(20 / 10)
-	fmt.Println(20 % 10)
+	var useColor bool
+	flag.BoolVar(&useColor, "c", false, "Use color output")
+	flag.Parse()
+
+	dir, err := os.Open(".")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	defer dir.Close()
+
+	files, err := dir.Readdir(-1)
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+
+	for _, file := range files {
+		if useColor {
+			if file.IsDir() {
+				color.Yellow(file.Name())
+			} else {
+				fmt.Println(file.Name())
+			}
+		} else {
+			fmt.Println(file.Name())
+		}
+	}
 }
